@@ -3,8 +3,9 @@ venv/
 *.pyc
 __pycache__/
 instance/
-.env*
+.env
 *.sqlite3
+frontend/.env
 
 # Django
 db.sqlite3
