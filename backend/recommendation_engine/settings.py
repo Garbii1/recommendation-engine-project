@@ -145,7 +145,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Whitenoise storage backend ensures files are served efficiently in production.
 # Handles compression and adds unique hashes to filenames for caching.
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 
 # --- Default primary key field type ---
