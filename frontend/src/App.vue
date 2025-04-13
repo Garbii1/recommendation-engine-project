@@ -5,7 +5,7 @@
         <router-link to="/" class="flex items-center space-x-2">
           <!-- Logo Placeholder -->
           <img src="@/assets/logo.png" alt="App Logo" class="h-8 w-auto" />
-          <span class="text-xl font-semibold text-gray-700">RecApp</span>
+          <span class="text-xl font-semibold text-gray-700"></span>
         </router-link>
         <div class="space-x-4">
           <router-link to="/" class="text-gray-600 hover:text-blue-600 transition duration-150">Home</router-link>
