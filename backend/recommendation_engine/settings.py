@@ -1,44 +1,68 @@
 # backend/recommendation_engine/settings.py
+
 import os
 from pathlib import Path
-import dj_database_url # Add this import
+import dj_database_url  # To parse DATABASE_URL environment variable
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# --- Core Settings ---
+
 # SECURITY WARNING: keep the secret key used in production secret!
-# We will set this via environment variable later
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-your-default-development-key') # Default for dev
+# Read from environment variable in production. Provide a default for local dev.
+# Generate a real one for production using:
+# python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-=your_temporary_development_key_!@#$%^' # <-- CHANGE THIS for local dev if you want
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True' # Default True for dev
+# Read from environment variable. Defaults to True for local dev.
+# Set DJANGO_DEBUG=False in your production environment (e.g., PythonAnywhere WSGI or Heroku Config Vars)
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1'] # Add Heroku app URL later
-# For deployment, get host from env var
-HEROKU_APP_NAME = os.environ.get('HEROKU_APP_NAME')
-if HEROKU_APP_NAME:
-    ALLOWED_HOSTS.append(f"{HEROKU_APP_NAME}.herokuapp.com")
+# Define allowed hosts. Start with local hosts.
+# Add your production domain(s) here or read from an environment variable.
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+# Add PythonAnywhere domain if set via environment variable
+# (Set PYTHONANYWHERE_DOMAIN=your-username.pythonanywhere.com in your WSGI file or env vars)
+pythonanywhere_domain = os.environ.get('PYTHONANYWHERE_DOMAIN')
+if pythonanywhere_domain:
+    ALLOWED_HOSTS.append(pythonanywhere_domain)
+
+# Add Heroku domain if set via environment variable (example)
+# (Set HEROKU_APP_NAME=your-app-name in Heroku Config Vars)
+# heroku_app_name = os.environ.get('HEROKU_APP_NAME')
+# if heroku_app_name:
+#     ALLOWED_HOSTS.append(f"{heroku_app_name}.herokuapp.com")
 
 
-# Application definition
+# --- Application definition ---
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'whitenoise.runserver_nostatic', # Add Whitenoise
+    'whitenoise.runserver_nostatic', # For serving static files in dev without collectstatic
     'django.contrib.staticfiles',
-    # Third-party apps
+
+    # Third-Party Apps
     'rest_framework',
     'corsheaders',
-    # Your apps
-    'recommendations',
+
+    # Your Apps
+    'recommendations', # Your recommendations app
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # Add Whitenoise middleware AFTER SecurityMiddleware
-    'corsheaders.middleware.CorsMiddleware', # Add CORS middleware (Important!)
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Whitenoise - Place high up, after SecurityMiddleware
+    'corsheaders.middleware.CorsMiddleware', # CORS - Place before CommonMiddleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -47,12 +71,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'recommendation_engine.urls'
+ROOT_URLCONF = 'recommendation_engine.urls' # Assumes your project directory is 'recommendation_engine'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [], # Add global template directories here if needed
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -65,83 +89,122 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'recommendation_engine.wsgi.application'
+WSGI_APPLICATION = 'recommendation_engine.wsgi.application' # Assumes project directory is 'recommendation_engine'
 
-# Database
+
+# --- Database ---
 # https://docs.djangoproject.com/en/stable/ref/settings/#databases
-# Use dj-database-url to parse the DATABASE_URL environment variable
+# Uses dj-database-url to parse the DATABASE_URL environment variable.
+# Defaults to SQLite for easy local development if DATABASE_URL is not set.
+
 DATABASES = {
     'default': dj_database_url.config(
-        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}', # Default to SQLite for local dev
-        conn_max_age=600 # Optional: connection pooling
+        # Set DATABASE_URL in your environment (e.g., mysql://user:pass@host:port/dbname for PythonAnywhere)
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}', # Local SQLite fallback
+        conn_max_age=600 # Optional: Number of seconds database connections should persist
     )
 }
 
 
-# Password validation
+# --- Password validation ---
 # https://docs.djangoproject.com/en/stable/ref/settings/#auth-password-validators
+
 AUTH_PASSWORD_VALIDATORS = [
-    # ... (keep defaults)
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
 
-# Internationalization
+
+# --- Internationalization ---
 # https://docs.djangoproject.com/en/stable/topics/i18n/
+
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/stable/howto/static-files/
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles' # Directory where collectstatic will gather static files
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' # Whitenoise storage
 
-# Default primary key field type
+# --- Static files (CSS, JavaScript, Images) ---
+# https://docs.djangoproject.com/en/stable/howto/static-files/
+# https://whitenoise.evans.io/
+
+STATIC_URL = '/static/'
+
+# Directory where `collectstatic` will gather static files for deployment.
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Whitenoise storage backend ensures files are served efficiently in production.
+# Handles compression and adds unique hashes to filenames for caching.
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+# --- Default primary key field type ---
 # https://docs.djangoproject.com/en/stable/ref/settings/#default-auto-field
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Django REST Framework settings (optional, can add later if needed)
+
+# --- Django REST Framework Settings ---
+# https://www.django-rest-framework.org/api-guide/settings/
+
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
-        # Add BrowsableAPIRenderer only if DEBUG is True
-        # 'rest_framework.renderers.BrowsableAPIRenderer',
+        # Add BrowsableAPIRenderer only during development for easier API testing in browser
+        # Conditionally added below based on DEBUG setting
     ],
-     # Add authentication/permission classes if needed later
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+    ],
+    # Authentication and Permissions can be added globally here later if needed
     'DEFAULT_AUTHENTICATION_CLASSES': [],
-    'DEFAULT_PERMISSION_CLASSES': [],
+    'DEFAULT_PERMISSION_CLASSES': [
+        # By default, allow any request. Change this if you add authentication.
+        'rest_framework.permissions.AllowAny',
+    ],
 }
-# Add Browsable API only in development
+
+# Add Browsable API only in development for convenience
 if DEBUG:
     REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'].append('rest_framework.renderers.BrowsableAPIRenderer')
 
 
-# CORS Settings (VERY IMPORTANT for Frontend <-> Backend communication)
-# Allow requests from your Vue app's domain during development and production
+# --- CORS (Cross-Origin Resource Sharing) Settings ---
+# https://github.com/adamchainz/django-cors-headers
+
+# Define origins allowed to make requests to your API.
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",  # Default Vue dev server port
+    # Local development frontend
+    "http://localhost:8080", # Default Vue CLI port
     "http://127.0.0.1:8080",
-    # Add Netlify/Vercel frontend URL later
+    "http://localhost:5173", # Default Vite port (just in case)
+    "http://127.0.0.1:5173",
 ]
-# If using credentials (like cookies or auth headers), set:
+
+# Add the production frontend URL from an environment variable
+# Set FRONTEND_URL=https://your-netlify-app.netlify.app (or Vercel URL) in your production environment
+frontend_url = os.environ.get('FRONTEND_URL')
+if frontend_url:
+    CORS_ALLOWED_ORIGINS.append(frontend_url)
+
+# If you need to allow credentials (like cookies or authorization headers)
 # CORS_ALLOW_CREDENTIALS = True
 
-# Optional: Allow specific headers or methods if needed
+# You can also specify allowed methods or headers if needed
 # CORS_ALLOW_METHODS = [...]
 # CORS_ALLOW_HEADERS = [...]
 
-# Set CORS_ALLOWED_ORIGIN_REGEXES if you have dynamic frontend previews on Netlify/Vercel
-# Example for Netlify deploy previews:
+# For dynamic preview URLs (e.g., Netlify deploy previews), consider using regex:
 # CORS_ALLOWED_ORIGIN_REGEXES = [
 #     r"^https://\w+--your-netlify-app-name\.netlify\.app$",
 # ]
-# Example for Vercel previews:
-# CORS_ALLOWED_ORIGIN_REGEXES = [
-#     r"^https://your-vercel-project-name-.*\.vercel\.app$",
-# ]
-
-# Environment variable for frontend URL (better approach)
-FRONTEND_URL = os.environ.get('FRONTEND_URL')
-if FRONTEND_URL:
-    CORS_ALLOWED_ORIGINS.append(FRONTEND_URL)
