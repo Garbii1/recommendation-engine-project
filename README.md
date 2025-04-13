@@ -179,6 +179,19 @@ Follow these instructions to set up the project locally for development and test
 
 *   **User Authentication:** Implement user registration and login (e.g., using Django Allauth).
 *   **Interaction History:** Store user interactions (clicks, ratings, purchases) to improve recommendations.
+*   **Enhanced User Data Collection & Interaction Service:**
+    *   Implement robust user authentication and profiles (e.g., using Django Allauth or JWT).
+    *   Develop dedicated API endpoints (`POST /api/interactions/`) to securely collect detailed user behavior data:
+        *   Item views/clicks
+        *   Ratings (e.g., 1-5 stars) or Likes/Dislikes
+        *   Items added to cart/wishlist (for e-commerce)
+        *   Content watch time/completion (for streaming)
+        *   Search queries
+    *   Create database models (`Interaction`, `UserProfile`) to persistently store this interaction history.
+    *   Allow users to explicitly manage their preferences (e.g., genres, tags, artists they like/dislike).
+*   **Integration Capabilities:**
+    *   Design the API to be easily integrated into existing e-commerce platforms or content streaming services.
+    *   Consider providing embeddable widgets or SDKs.            
 *   **Advanced Algorithms:** Implement more sophisticated recommendation techniques:
     *   **Collaborative Filtering:** Using user-item interaction data (requires user history).
     *   **Content-Based Filtering:** Using item metadata (descriptions, tags) and user profiles.
@@ -197,9 +210,6 @@ Follow these instructions to set up the project locally for development and test
         *   User cohort analysis.
  *   **User-Facing Visualization (Optional):** Implement features explaining *why* an item was recommended (e.g., "Because you liked X", "Similar users also liked Y", "Based on your interest in Z category"). Could involve simple tags or more complex visualizations.
     *   Utilize charting libraries (e.g., Chart.js, Plotly, D3.js on the frontend; Matplotlib/Seaborn on the backend for generating static charts/reports).
-*   **Integration Capabilities:**
-    *   Design the API to be easily integrated into existing e-commerce platforms or content streaming services.
-    *   Consider providing embeddable widgets or SDKs.        
 
 ## Author
 
