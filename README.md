@@ -189,6 +189,17 @@ Follow these instructions to set up the project locally for development and test
     *   Add item detail pages.
 *   **Testing:** Add unit and integration tests for both backend and frontend.
 *   **Containerization:** Dockerize the application for easier setup and deployment consistency.
+*   **Data Visualization & Dashboards:**
+    *   **Admin Dashboard:** Create a section (potentially using the Django Admin or a separate interface) to visualize key metrics:
+        *   Most popular items/content.
+        *   User engagement rates (e.g., click-through rate on recommendations).
+        *   Recommendation algorithm performance (e.g., precision, recall).
+        *   User cohort analysis.
+ *   **User-Facing Visualization (Optional):** Implement features explaining *why* an item was recommended (e.g., "Because you liked X", "Similar users also liked Y", "Based on your interest in Z category"). Could involve simple tags or more complex visualizations.
+    *   Utilize charting libraries (e.g., Chart.js, Plotly, D3.js on the frontend; Matplotlib/Seaborn on the backend for generating static charts/reports).
+*   **Integration Capabilities:**
+    *   Design the API to be easily integrated into existing e-commerce platforms or content streaming services.
+    *   Consider providing embeddable widgets or SDKs.        
 
 ## Author
 
